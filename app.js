@@ -21,7 +21,7 @@ import {deleteOne,deleteMany} from './DeleteMethods/DeleteMethods.js'
 
 //aggregation method
 
-import { countAllActiveUsers,findAllOrdersOfSree,findAllOrderOfSub, countAllActive } from "./Aggregation/LearnAggregationPipeline.js";
+import { countAllActiveUsers,findAllOrdersOfSree,findAllOrderOfSub, countAllActive, findSreekanthOrders } from "./Aggregation/LearnAggregationPipeline.js";
 
 async function runMoongose(){
     await mongoose.connect('mongodb+srv://sreekanth:Sree%40123@mongowmongoose.cn6jnfx.mongodb.net/')
@@ -65,4 +65,5 @@ runMoongose()
 // countAllActiveUsers()
 // findAllOrdersOfSree()
 // findAllOrderOfSub()
-countAllActive()
+// countAllActive()
+findSreekanthOrders()

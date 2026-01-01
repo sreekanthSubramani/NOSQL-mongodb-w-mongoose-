@@ -102,27 +102,89 @@ export const countAllActive = async () =>{
         const countAllActiveUsers = await Usermodel.aggregate([
             {
                 $match : {
-                    isActive : true,
+                    isActive : true
                 }
             },
             {
-                $count : "totalActiveUsers"
-            },
-            {
-                $addFields : {
-                    isActive : "true",
-                    totalUsers : "$totalActiveUsers"
-                }
-            },
-            {
-                $project : {
-                    totalActiveUsers : 0
+                $group : {
+                    _id : null,
+                    isActive : {$sum : 1},
                 }
             }
         ])
         console.log(countAllActiveUsers, 'all active users')
     }catch(e){
         console.log(e, 'error')
+    }
+}
+
+
+//find how much order does sreekanth made ?
+
+
+export const findSreekanthOrders = async () =>{
+
+    const sreeID = new mongoose.Types.ObjectId('6952cc44df7e817f39faf89a')
+    
+    try{
+        const sreekanthTotalOrders = await Orders.aggregate([
+            {
+                $match : {
+                    userDetails : sreeID
+                }
+            },
+            {
+                $lookup : {
+                    from : 'users',
+                    localField : 'userDetails',
+                    foreignField : "_id",
+                    as : 'user'
+                }
+            },
+            {
+                $unwind : '$user'
+            },
+            {
+                $group :{
+                    _id : null,
+                    totalOrders : {$sum : '$price'},
+                    userName : {$first : "$user.name"},
+                    userEmail : {$first : '$user.email'}
+                }
+            },
+            {
+                $addFields : {
+                    level : {
+                        $switch : {
+                            branches : [
+                                {case : {$gte : ['$totalOrders', 400]}, then : "A"},
+                                {case : {$gte : ['$totalOrders', 300]}, then : "B"}
+                            ]
+                        }
+                    }
+                }
+            },
+            {
+                $project : {
+                    _id : 0,
+                    userName : 1,
+                    userEmail : 1,
+                    totalOrders : 1,
+                    status: {
+                        $cond : [
+                            {$gt : ['$totalOrders', 300]},
+                            "Pass", "Fail"
+                        ]
+                    },
+                    level : 1
+                }
+            }
+        ])
+
+        console.log(sreekanthTotalOrders, 'sree total orders')
+        
+    }catch(e){
+        console.log(e)
     }
 }
 
